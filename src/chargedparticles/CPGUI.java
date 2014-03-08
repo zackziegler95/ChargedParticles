@@ -69,22 +69,22 @@ public class CPGUI extends javax.swing.JFrame {
                 if (p.charge > 0) g.setColor(Color.RED);
                 else g.setColor(Color.BLACK);
                 
-                int r = 5;
+                int r = (int)(p.pos.z()+realWidth/2+1);
                 g.fillOval((int)(p.pos.x()*getWidth()/realWidth+getWidth()/2)-r,
                         (int)(-p.pos.y()*getHeight()/realHeight+getHeight()/2)-r, (int)(2*r), (int)(2*r));
             }
             
-            g.setColor(Color.BLACK);
+            /*g.setColor(Color.BLACK);
             for (Restraint r : restraints) {
-                Vector2 tangent = r.normal.perp().times(r.len/2.0);
-                Vector2 p1 = r.pos.plus(tangent);
-                Vector2 p2 = r.pos.minus(tangent);
+                Vector3 tangent = r.normal.perp().times(r.len/2.0);
+                Vector3 p1 = r.pos.plus(tangent);
+                Vector3 p2 = r.pos.minus(tangent);
                 
                 g.drawLine((int)(p1.x()*getWidth()/realWidth+getWidth()/2),
                         (int)(-p1.y()*getHeight()/realHeight+getHeight()/2),
                         (int)(p2.x()*getWidth()/realWidth+getWidth()/2),
                         (int)(-p2.y()*getHeight()/realHeight+getHeight()/2));
-            }
+            }*/
         }
     }
     

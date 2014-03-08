@@ -6,7 +6,7 @@ import java.util.TimerTask;
 
 public class Engine {
     private CPGUI gui;
-    private double dt = 0.015;
+    private double dt = 0.03;
     public static final double k = 5;
     
     public ArrayList<Particle> particles = new ArrayList<>();
@@ -18,29 +18,36 @@ public class Engine {
     
     public void start() {
         
-        for (int i = 0; i < 0; i++) {
-            double r = Math.random()*0.9+1.05;
-            double theta = Math.random()*2*Math.PI;
-            particles.add(new Particle(new Vector2(r*Math.cos(theta), r*Math.sin(theta)),
-                    new Vector2(0, 0), 1, 1.0/20));
+        for (int i = 0; i < 1200; i++) {
+            double r = Math.random()*0.9+2.05;
+            double theta = Math.random()*Math.PI;
+            double phi = Math.random()*2*Math.PI;
+            particles.add(new Particle(new Vector3(r*Math.sin(theta)*Math.cos(phi),
+                    r*Math.sin(theta)*Math.sin(phi),
+                    r*Math.cos(theta)),
+                    new Vector3(0, 0, 0), 1, 1.0/120.0));
         }
         
-        for (int i = 0; i < 200; i++) {
-            double r = Math.random()*0.9+1.05;
-            double theta = Math.random()*2*Math.PI;
-            particles.add(new Particle(new Vector2(r*Math.cos(theta), r*Math.sin(theta)),
-                    new Vector2(0, 0), 1, -1.0/20));
+        for (int i = 0; i < 1200; i++) {
+            double r = Math.random()*0.9+2.05;
+            double theta = Math.random()*Math.PI;
+            double phi = Math.random()*2*Math.PI;
+            particles.add(new Particle(new Vector3(r*Math.sin(theta)*Math.cos(phi),
+                    r*Math.sin(theta)*Math.sin(phi),
+                    r*Math.cos(theta)),
+                    new Vector3(0, 0, 0), 1, -1.0/120.0));
         }
         
-        particles.add(new Particle(new Vector2(0, 0), new Vector2(0, 0), 9999999, 10));
+        particles.add(new Particle(new Vector3(0.5, 0, 0), new Vector3(0, 0, 0), 9999999, 10));
+        particles.add(new Particle(new Vector3(4, 0, 0), new Vector3(0, 0, 0), 9999999, 20));
         //particles.add(new Particle(new Vector2(4, 0), new Vector2(0, 0), 9999999, 20));
         //particles.add(new Particle(new Vector2(3, 0), new Vector2(0, 0), 1, -1));
         //particles.add(new Particle(new Vector2(3, 3), new Vector2(0, 0), 1, -1));
         
-        //restraints.add(new Restraint(new Vector2(0, 0), 8, new Vector2(1, 1).normalize()));
+        //restraints.add(new Restraint(new Vector3(0, 0, 0), 8, new Vector3(1, 0, -1).normalize(), true));
         
-        makeCircle(new Vector2(), 3, 30, false);
-        makeCircle(new Vector2(), 1, 30, true);
+        makeSphere(new Vector3(), 3, 30, false);
+        makeSphere(new Vector3(), 1, 30, true);
         
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -55,19 +62,29 @@ public class Engine {
             @Override
             public void run() {
                 Calculate.calcPotentials(particles);
+                for (Particle p : particles) {
+                    if (p.pos.magSq() < 1) {
+                        System.out.println("inside");
+                    }
+                }
             }
-        }, 30000);
+        }, 1000);
     }
     
-    public void makeCircle(Vector2 center, double r, int n, boolean inside) {
+    public void makeSphere(Vector3 center, double r, int n, boolean inside) {
         double rad = 2*Math.PI/n;
         double len = 2*r*Math.tan(rad/2);
         
         for (int i = 0; i < n; i++) {
-            double ang = i*rad;
-            Vector2 pos = new Vector2(r*Math.cos(ang), r*Math.sin(ang)).plus(center);
-            Vector2 normal = pos.minus(center).normalize();
-            restraints.add(new Restraint(pos, len, normal, inside));
+            double phi = i*rad;
+            for (int j = 0; j < (int)((n+0.5)/2.0); j++) {
+                double theta = j*rad;
+                Vector3 pos = new Vector3(r*Math.sin(theta)*Math.cos(phi),
+                        r*Math.sin(theta)*Math.sin(phi),
+                        r*Math.cos(theta)).plus(center);
+                Vector3 normal = pos.minus(center).normalize();
+                restraints.add(new Restraint(pos, len, normal, inside));
+            }
         }
     }
     
@@ -93,7 +110,7 @@ public class Engine {
         
         for (Particle p : particles) {
             p.pos = p.pos.plus(p.vel.times(dt));
-            p.force = new Vector2();
+            p.force = new Vector3();
         }
     }
 }
